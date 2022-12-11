@@ -1,52 +1,31 @@
 class Nodo:
-    """
-    Implemente a classe Nodo com os atributos descritos na funcao init
-    """
     def __init__(self, estado, pai, acao, custo):
-        """
-        Inicializa o nodo com os atributos recebidos
-        :param estado:str, representacao do estado do 8-puzzle
-        :param pai:Nodo, referencia ao nodo pai, (None no caso do nó raiz)
-        :param acao:str, acao a partir do pai que leva a este nodo (None no caso do nó raiz)
-        :param custo:int, custo do caminho da raiz até este nó
-        """
-        # substitua a linha abaixo pelo seu codigo
-        raise NotImplementedError
-
+        self.estado=estado
+        self.pai=pai
+        self.acao=acao
+        self.custo=custo
+    def __repr__(self) -> str:
+        return str(self)
+    def __str__(self):
+        return self.estado+" "+self.pai+" "+self.acao+" "+str(self.custo)
 
 def sucessor(estado):
-    """
-    Recebe um estado (string) e retorna uma lista de tuplas (ação,estado atingido)
-    para cada ação possível no estado recebido.
-    Tanto a ação quanto o estado atingido são strings também.
-    :param estado:
-    :return:
-    """
-    # substituir a linha abaixo pelo seu codigo
     lista = []
     pos = estado.find("_")
     if(pos != 0 != 3 !=6):
-        list.append("esquerda",changePos(estado,pos,pos-1))
+        lista.append(("esquerda",changePos(estado,pos,pos-1)))
     if(pos !=2 !=4 !=8):
-         list.append("direita",changePos(estado,pos,pos+1))
+         lista.append(("direita",changePos(estado,pos,pos+1)))
     if(pos !=1 !=2 !=3):
-         list.append("abaixo",changePos(estado,pos,pos-3))
+         lista.append(("acima",changePos(estado,pos,pos-3)))
     if(pos !=6 !=7 !=8):
-         list.append("acima",changePos(estado,pos,pos+3))
+         lista.append(("abaixo",changePos(estado,pos,pos+3)))
     return lista       
       
 
-
-
 def expande(nodo):
-    """
-    Recebe um nodo (objeto da classe Nodo) e retorna um iterable de nodos.
-    Cada nodo do iterable é contém um estado sucessor do nó recebido.
-    :param nodo: objeto da classe Nodo
-    :return:
-    """
-    # substituir a linha abaixo pelo seu codigo
-    raise NotImplementedError
+    return list(map(lambda e:Nodo(e[0],nodo.estado,e[1],nodo.custo+1),sucessor(nodo.estado)))
+   
 
 
 def bfs(estado):
@@ -102,7 +81,7 @@ def astar_manhattan(estado):
 
 def changePos(estado,x,y):
     lista = list(estado)
-    x = lista[x]
+    temp = lista[x]
     lista[x]=lista[y]
-    lista[y]=x
+    lista[y]=temp
     return "".join(lista)

@@ -1,9 +1,11 @@
+from collections import deque
 class Nodo:
-    def __init__(self, estado, pai, acao, custo):
+    def __init__(self, estado, pai, acao, custo,caminho):
         self.estado=estado
         self.pai=pai
         self.acao=acao
         self.custo=custo
+        self.caminho=caminho
     def __repr__(self) -> str:
         return str(self)
     def __str__(self):
@@ -12,46 +14,59 @@ class Nodo:
 def sucessor(estado):
     lista = []
     pos = estado.find("_")
-    if(pos != 0 != 3 !=6):
+    if(pos != 0 and pos!= 3 and pos!=6):
         lista.append(("esquerda",changePos(estado,pos,pos-1)))
-    if(pos !=2 !=4 !=8):
+    if(pos !=2 and pos!=5 and pos!=8):
          lista.append(("direita",changePos(estado,pos,pos+1)))
-    if(pos !=1 !=2 !=3):
+    if(pos !=1 and pos!=2 and pos!=3):
          lista.append(("acima",changePos(estado,pos,pos-3)))
-    if(pos !=6 !=7 !=8):
+    if(pos !=6 and pos!=7 and pos!=8):
          lista.append(("abaixo",changePos(estado,pos,pos+3)))
     return lista       
       
 
 def expande(nodo):
-    return list(map(lambda e:Nodo(e[0],nodo.estado,e[1],nodo.custo+1),sucessor(nodo.estado)))
-   
+    lista = []
+    for pair in sucessor(nodo.estado):
+        caminho = nodo.caminho.copy()
+        caminho.append(pair[0])
+        lista.append(Nodo(pair[1],nodo.estado,pair[0],nodo.custo+1,caminho))
+    return lista
 
 
 def bfs(estado):
-    """
-    Recebe um estado (string), executa a busca em LARGURA e
-    retorna uma lista de ações que leva do
-    estado recebido até o objetivo ("12345678_").
-    Caso não haja solução a partir do estado recebido, retorna None
-    :param estado: str
-    :return:
-    """
-    # substituir a linha abaixo pelo seu codigo
-    raise NotImplementedError
+    x = set()
+    f = deque()
+    f.append(Nodo(estado,None,None,0,[]))
+    while(True):
+        if not f:
+            raise RuntimeError
+        curr = f.popleft()
+        if(curr.estado=="12345678_"):
+            return curr.caminho
+        else:
+            x.add(curr.estado)
+            for e in expande(curr):
+                if e.estado not in x:
+                    f.append(e)
 
 
 def dfs(estado):
-    """
-    Recebe um estado (string), executa a busca em PROFUNDIDADE e
-    retorna uma lista de ações que leva do
-    estado recebido até o objetivo ("12345678_").
-    Caso não haja solução a partir do estado recebido, retorna None
-    :param estado: str
-    :return:
-    """
-    # substituir a linha abaixo pelo seu codigo
-    raise NotImplementedError
+    x = set()
+    f = deque()
+
+    f.append(Nodo(estado,None,None,0,[]))
+    while(True):
+        if not f:
+            raise RuntimeError
+        curr = f.pop()
+        if(curr.estado=="12345678_"):
+            return curr.caminho
+        else:
+            x.add(curr.estado)
+            for e in expande(curr):
+                if e.estado not in x:
+                   f.append(e)
 
 
 def astar_hamming(estado):

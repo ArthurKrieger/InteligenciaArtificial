@@ -1,15 +1,23 @@
 from collections import deque
+import heapq
+import random
+
 class Nodo:
-    def __init__(self, estado, pai, acao, custo,caminho):
+    def __init__(self, estado, pai, acao, custo,caminho,comparator=None):
         self.estado=estado
         self.pai=pai
         self.acao=acao
         self.custo=custo
         self.caminho=caminho
+        self.comparator=comparator
     def __repr__(self) -> str:
         return str(self)
     def __str__(self):
         return self.estado+" "+self.pai+" "+self.acao+" "+str(self.custo)
+    def __le__(self,other):
+        return self.comparator(self.estado)+self.custo<=self.comparator(other.estado)+other.custo
+    def __lt__(self,other):
+        return self.comparator(self.estado)+self.custo<self.comparator(other.estado)+other.custo
 
 def sucessor(estado):
     lista = []
@@ -30,18 +38,29 @@ def expande(nodo):
     for pair in sucessor(nodo.estado):
         caminho = nodo.caminho.copy()
         caminho.append(pair[0])
-        lista.append(Nodo(pair[1],nodo.estado,pair[0],nodo.custo+1,caminho))
+        lista.append(Nodo(pair[1],nodo.estado,pair[0],nodo.custo+1,caminho,nodo.comparator))
     return lista
-
+    
 
 def bfs(estado):
     x = set()
     f = deque()
     f.append(Nodo(estado,None,None,0,[]))
-    while(True):
-        if not f:
-            raise RuntimeError
+    while(f):
         curr = f.popleft()
+        if(curr.estado=="12345678_"):
+            return curr.caminho
+        else:
+            x.add(curr.estado)
+            for e in expande(curr):
+                if e.estado not in x:
+                    f.append(e)
+def dfs(estado):
+    x = set()
+    f = deque()
+    f.append(Nodo(estado,None,None,0,[]))
+    while(f):
+        curr = f.pop()
         if(curr.estado=="12345678_"):
             return curr.caminho
         else:
@@ -51,48 +70,33 @@ def bfs(estado):
                     f.append(e)
 
 
-def dfs(estado):
+def astar_hamming(estado):
     x = set()
-    f = deque()
-
-    f.append(Nodo(estado,None,None,0,[]))
-    while(True):
-        if not f:
-            raise RuntimeError
-        curr = f.pop()
+    priorityQueue = []
+    heapq.heappush(priorityQueue,Nodo(estado,None,None,0,[],hamming))
+    while(priorityQueue):
+        curr = heapq.heappop(priorityQueue)
         if(curr.estado=="12345678_"):
             return curr.caminho
         else:
             x.add(curr.estado)
             for e in expande(curr):
                 if e.estado not in x:
-                   f.append(e)
-
-
-def astar_hamming(estado):
-    """
-    Recebe um estado (string), executa a busca A* com h(n) = soma das distâncias de Hamming e
-    retorna uma lista de ações que leva do
-    estado recebido até o objetivo ("12345678_").
-    Caso não haja solução a partir do estado recebido, retorna None
-    :param estado: str
-    :return:
-    """
-    # substituir a linha abaixo pelo seu codigo
-    raise NotImplementedError
-
+                    heapq.heappush(priorityQueue,e)
 
 def astar_manhattan(estado):
-    """
-    Recebe um estado (string), executa a busca A* com h(n) = soma das distâncias de Manhattan e
-    retorna uma lista de ações que leva do
-    estado recebido até o objetivo ("12345678_").
-    Caso não haja solução a partir do estado recebido, retorna None
-    :param estado: str
-    :return:
-    """
-    # substituir a linha abaixo pelo seu codigo
-    raise NotImplementedError
+    x = set()
+    priorityQueue = []
+    heapq.heappush(priorityQueue,Nodo(estado,None,None,0,[],manhattan))
+    while(priorityQueue):
+        curr = heapq.heappop(priorityQueue)
+        if(curr.estado=="12345678_"):
+            return curr.caminho
+        else:
+            x.add(curr.estado)
+            for e in expande(curr):
+                if e.estado not in x:
+                    heapq.heappush(priorityQueue,e)
 
 def changePos(estado,x,y):
     lista = list(estado)
@@ -100,3 +104,19 @@ def changePos(estado,x,y):
     lista[x]=lista[y]
     lista[y]=temp
     return "".join(lista)
+
+def hamming(estado):
+    acc = 0
+    desired = "12345678_"
+    for i in range(len(estado)):
+        if(estado[i]!=desired[i]):
+            acc = acc+1
+    return acc
+
+def manhattan(estado):
+    acc = 0
+    desired = "12345678_"
+    for i in range(len(estado)):
+        pos = desired.find(estado[i])
+        acc= acc + pos - i%3
+    return 0

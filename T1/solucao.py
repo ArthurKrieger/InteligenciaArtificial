@@ -1,6 +1,5 @@
 from collections import deque
 import heapq
-import random
 
 class Nodo:
     def __init__(self, estado, pai, acao, custo,caminho,comparator=None):
@@ -118,5 +117,5 @@ def manhattan(estado):
     desired = "12345678_"
     for i in range(len(estado)):
         pos = desired.find(estado[i])
-        acc= acc + pos - i%3
-    return 0
+        acc= acc + abs(abs(i-pos) - abs(i%3))
+    return acc

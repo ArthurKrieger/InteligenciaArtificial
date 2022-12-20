@@ -114,9 +114,10 @@ def hamming(estado):
     return acc
 
 def manhattan(estado):
-    acc = 0
-    desired = "12345678_"
-    for i in range(len(estado)):
-        pos = desired.find(estado[i])
-        acc= acc + abs(abs(i-pos) - abs(i%3))
-    return acc
+	acc = 0
+	desired = "12345678_"
+	for i in range(len(estado)):
+		des = desired.find(estado[i])
+		if (estado[i] != "_"):
+			acc = acc + abs(i%3-des%3) + abs(i//3-des//3)
+	return acc

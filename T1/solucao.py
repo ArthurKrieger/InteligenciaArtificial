@@ -2,7 +2,7 @@ from collections import deque
 import heapq
 
 class Nodo:
-    def __init__(self, estado, pai, acao, custo,caminho,comparator=None):
+    def __init__(self, estado, pai, acao, custo,caminho=[],comparator=None):
         self.estado=estado
         self.pai=pai
         self.acao=acao
@@ -25,7 +25,7 @@ def sucessor(estado):
         lista.append(("esquerda",changePos(estado,pos,pos-1)))
     if(pos !=2 and pos!=5 and pos!=8):
          lista.append(("direita",changePos(estado,pos,pos+1)))
-    if(pos !=1 and pos!=2 and pos!=3):
+    if(pos !=0 and pos!=1 and pos!=2):
          lista.append(("acima",changePos(estado,pos,pos-3)))
     if(pos !=6 and pos!=7 and pos!=8):
          lista.append(("abaixo",changePos(estado,pos,pos+3)))
@@ -37,7 +37,7 @@ def expande(nodo):
     for pair in sucessor(nodo.estado):
         caminho = nodo.caminho.copy()
         caminho.append(pair[0])
-        lista.append(Nodo(pair[1],nodo.estado,pair[0],nodo.custo+1,caminho,nodo.comparator))
+        lista.append(Nodo(pair[1],nodo,pair[0],nodo.custo+1,caminho,nodo.comparator))
     return lista
     
 
@@ -56,6 +56,7 @@ def bfs(estado):
                     f.append(e)
 def dfs(estado):
     x = set()
+    a=0
     f = deque()
     f.append(Nodo(estado,None,None,0,[]))
     while(f):
@@ -65,7 +66,7 @@ def dfs(estado):
         else:
             x.add(curr.estado)
             for e in expande(curr):
-                if e.estado not in x:
+                if e.estado not in x and e.custo<100:
                     f.append(e)
 
 

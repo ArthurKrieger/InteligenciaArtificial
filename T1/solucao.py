@@ -2,12 +2,11 @@ from collections import deque
 import heapq
 
 class Nodo:
-    def __init__(self, estado, pai, acao, custo,caminho=[],comparator=None):
+    def __init__(self, estado, pai, acao, custo,comparator=None):
         self.estado=estado
         self.pai=pai
         self.acao=acao
         self.custo=custo
-        self.caminho=caminho
         self.comparator=comparator
     def __repr__(self) -> str:
         return str(self)
@@ -34,21 +33,19 @@ def sucessor(estado):
 
 def expande(nodo):
     lista = []
-    for pair in sucessor(nodo.estado):
-        caminho = nodo.caminho.copy()
-        caminho.append(pair[0])
-        lista.append(Nodo(pair[1],nodo,pair[0],nodo.custo+1,caminho,nodo.comparator))
+    for acao, estado in sucessor(nodo.estado):
+        lista.append(Nodo(estado, nodo, acao, nodo.custo + 1,nodo.comparator))
     return lista
     
 
 def bfs(estado):
     x = set()
     f = deque()
-    f.append(Nodo(estado,None,None,0,[]))
+    f.append(Nodo(estado,None,None,0))
     while(f):
         curr = f.popleft()
         if(curr.estado=="12345678_"):
-            return curr.caminho
+            return getpath(curr)
         else:
             x.add(curr.estado)
             for e in expande(curr):
@@ -58,11 +55,11 @@ def dfs(estado):
     x = set()
     a=0
     f = deque()
-    f.append(Nodo(estado,None,None,0,[]))
+    f.append(Nodo(estado,None,None,0))
     while(f):
         curr = f.pop()
         if(curr.estado=="12345678_"):
-            return curr.caminho
+            return getpath(curr)
         else:
             x.add(curr.estado)
             for e in expande(curr):
@@ -73,11 +70,11 @@ def dfs(estado):
 def astar_hamming(estado):
     x = set()
     priorityQueue = []
-    heapq.heappush(priorityQueue,Nodo(estado,None,None,0,[],hamming))
+    heapq.heappush(priorityQueue,Nodo(estado,None,None,0,hamming))
     while(priorityQueue):
         curr = heapq.heappop(priorityQueue)
         if(curr.estado=="12345678_"):
-            return curr.caminho
+            return getpath(curr)
         else:
             x.add(curr.estado)
             for e in expande(curr):
@@ -87,11 +84,11 @@ def astar_hamming(estado):
 def astar_manhattan(estado):
     x = set()
     priorityQueue = []
-    heapq.heappush(priorityQueue,Nodo(estado,None,None,0,[],manhattan))
+    heapq.heappush(priorityQueue,Nodo(estado,None,None,0,manhattan))
     while(priorityQueue):
         curr = heapq.heappop(priorityQueue)
         if(curr.estado=="12345678_"):
-            return curr.caminho
+            return getpath(curr)
         else:
             x.add(curr.estado)
             for e in expande(curr):
@@ -121,3 +118,14 @@ def manhattan(estado):
 		if (estado[i] != "_"):
 			acc = acc + abs(i%3-des%3) + abs(i//3-des//3)
 	return acc
+
+def getpath(nodo):
+    arraydir = []
+    nodoaux = nodo
+    pai = nodoaux.pai
+    while pai != None:
+        arraydir.append(nodoaux.acao)
+        nodoaux = nodoaux.pai
+        pai = nodoaux.pai
+        
+    return list(reversed(arraydir))  
